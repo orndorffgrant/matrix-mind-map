@@ -7,13 +7,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import { page } from "$app/stores";
 import { nodeStore } from "./_store.ts";
+import Map from "$lib/Map.svelte";
+import Tree from "$lib/Tree.svelte";
+
 let newItemTitle = "";
 
-$: treeData = Object.keys($nodeStore.nodes).map(id => {
-  return {
-    "name": $nodeStore.nodes[id].title
-  }
-})
+$: treeData = Object.values($nodeStore.nodes)
+
+$: treeJSON = JSON.stringify($nodeStore.nodes)
 
 let treeOptions = {
   title: "Tree",
@@ -24,14 +25,32 @@ let treeOptions = {
 }
 
 type Node = {
-  title: string,
+  id: string,
+  text: string,
   parentId: string | null, // null means top level
 }
 
+if (!$nodeStore.nodes["root"]) {
+  $nodeStore.nodes["root"] = {
+    id: "root",
+    text: $page.params.room,
+    parentId: null,
+  }
+}
+
 function onEnter(event) {
+  let parentId = "root"
+  let text = newItemTitle
+  if (text[0] === "#") {
+    const splitText = text.split(" ")
+    parentId = splitText.shift().substring(1)
+    text = splitText.join(" ")
+  }
   const id = uuidv4();
   const node: Node = {
-    title: newItemTitle,
+    id,
+    parentId,
+    text,
   }
 
   $nodeStore.nodes[id] = node;
@@ -65,7 +84,12 @@ function onKeyup(event) {
     </div>
   </div>
 
+
   <div>
+  {treeJSON}
+  </div>
+  <div>
+    <Tree data={treeData} width={1000} padding={10}/>
   </div>
 
 </div>
