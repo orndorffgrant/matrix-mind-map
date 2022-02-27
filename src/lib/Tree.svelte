@@ -24,7 +24,7 @@ $: horizontalSpace = width / (root.height + padding);
 $: tree = d3.tree().nodeSize([verticalSpace, horizontalSpace])(root);
 
 $: links = tree.links()
-$: linkPaths = links.map(link => d3.linkHorizontal().x(coord => coord.y).y(coord => coord.x)(link))
+$: linkPaths = links.map(link => d3.linkHorizontal().x(coord => coord.y).y(coord => coord.x).source(d => ({ x: d.source.x, y: d.source.y + 20 }))(link))
 
 $: nodes = tree.descendants()
 
