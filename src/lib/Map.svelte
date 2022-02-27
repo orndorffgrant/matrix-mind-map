@@ -1,7 +1,8 @@
 <script lang="ts">
 import { onMount } from 'svelte';
+import Tree from "$lib/Tree.svelte";
 
-export let nodes;
+export let treeData;
 
 let container;
 let width = 500;
@@ -17,8 +18,8 @@ function resize() {
 
 <svelte:window on:resize='{resize}'/>
 
-<div>
-
+<div bind:this={container} class="w-full">
+    <Tree data={treeData} width={width} padding={10} on:setEditingParent />
 </div>
 
 <style>
