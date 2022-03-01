@@ -13,7 +13,8 @@ const config = {
 		adapter: adapter(),
 		paths: {
 			base: dev ? '' : '/matrix-mind-map',
-		}
+		},
+        appDir: 'internal',
 	}
 };
 
