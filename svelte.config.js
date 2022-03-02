@@ -14,7 +14,6 @@ const config = {
 		paths: {
 			base: dev ? '' : '/matrix-mind-map',
 		},
-        appDir: 'internal',
 	}
 };
 
