@@ -19,7 +19,7 @@ function resize() {
 <svelte:window on:resize='{resize}'/>
 
 <div bind:this={container} class="w-full">
-    <Tree data={treeData} width={width} padding={10} on:setEditingParent />
+    <Tree data={treeData} width={width} on:setEditingParent />
 </div>
 
 <style>

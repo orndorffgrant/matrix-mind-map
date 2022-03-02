@@ -15,16 +15,19 @@ type TreeNode = {
 
 export let data: TreeNode;
 export let width: number;
-export let padding: number;
 
 $: root = d3.stratify()(data)
 
-const verticalSpace = 24;
-$: horizontalSpace = width / (root.height + padding);
+const noteBox = {
+    width: 150,
+    height: 50,
+}
+const verticalSpace = noteBox.height + 12;
+const horizontalSpace = noteBox.width + 100;
 $: tree = d3.tree().nodeSize([verticalSpace, horizontalSpace])(root);
 
 $: links = tree.links()
-$: linkPaths = links.map(link => d3.linkHorizontal().x(coord => coord.y).y(coord => coord.x).source(d => ({ x: d.source.x, y: d.source.y + 20 }))(link))
+$: linkPaths = links.map(link => d3.linkHorizontal().x(coord => coord.y).y(coord => coord.x).source(d => ({ x: d.source.x, y: d.source.y + noteBox.width }))(link))
 
 $: nodes = tree.descendants()
 
@@ -42,7 +45,7 @@ $: {
 
     const height = heights.highest - heights.lowest + verticalSpace * 2;
     viewBox = {
-        minX: -horizontalSpace * padding / 2,
+        minX: -horizontalSpace,
         minY: heights.lowest - verticalSpace,
         width,
         height,
@@ -80,25 +83,29 @@ function setEditingParent(parentId) {
     <!-- nodes -->
     <g>
         {#each nodes as node}
-            <a
-                transform={`translate(${node.y}, ${node.x})`}
-                class="cursor-pointer"
-                on:click={() => setEditingParent(node.id)}
-            >
-                <circle
-                    fill={node.data.editing ? "cyan" : "#404040"}
-                    stroke="black"
-                    stroke-width={node.data.editing ? 1 : 0}
-                    r={node.data.editing ? 3 : 3}
+            <g>
+                <rect
+                    x={node.y}
+                    y={node.x - (noteBox.height / 2)}
+                    width={noteBox.width}
+                    height={noteBox.height}
+                    stroke={node.data.editing ? "cyan" : "#404040"}
+                    stroke-width=2
+                    rx=5
+                    fill="transparent"
+                    class="cursor-pointer"
+                    on:click={() => setEditingParent(node.id)}
                 />
                 <text
-                    dy="0.32em"
-                    x={node.children ? -6 : 6}
-                    text-anchor={node.children ? "end" : "start"}
+                    dy="0.5em"
+                    x={node.y + 10}
+                    y={node.x}
+                    width={noteBox.width}
+                    height={noteBox.height}
                     >
                     {node.data.text}
                 </text>
-            </a>
+            </g>
         {/each}
     </g>
 </svg>
