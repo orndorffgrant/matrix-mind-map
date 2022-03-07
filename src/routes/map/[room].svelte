@@ -89,6 +89,11 @@ function onSetEditingParent(event) {
   newItemParentId = event.detail.parentId;
   mainInput.focus();
 }
+function onDeleteNode(event) {
+  // TODO not hooked up
+  const id = event.detail.id;
+  $nodeStore.nodes[id] = undefined;
+}
 </script>
 
 <svelte:head>
@@ -127,7 +132,7 @@ function onSetEditingParent(event) {
   </div>
 
   <div class="w-full">
-    <Map treeData={treeDataWithEditing} on:setEditingParent={onSetEditingParent}/>
+    <Map treeData={treeDataWithEditing} on:setEditingParent={onSetEditingParent} />
   </div>
 </div>
 

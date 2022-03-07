@@ -1,9 +1,10 @@
 <script lang="ts">
-// This is a svelte port of https://observablehq.com/@d3/tree which is:
+// This started as a svelte port of https://observablehq.com/@d3/tree which is:
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 import { createEventDispatcher } from 'svelte';
 const dispatch = createEventDispatcher();
+import TreeNote from "$lib/TreeNote.svelte";
 
 import * as d3 from 'd3';
 
@@ -20,7 +21,7 @@ $: root = d3.stratify()(data)
 
 const noteBox = {
     width: 150,
-    height: 50,
+    height: 60,
 }
 const verticalSpace = noteBox.height + 12;
 const horizontalSpace = noteBox.width + 100;
@@ -58,57 +59,76 @@ function setEditingParent(parentId) {
         parentId,
     });
 }
+function deleteNode(id) {
+    dispatch('deleteNode', {
+        id,
+    });
+}
 </script>
 
-<svg
-    width={viewBox.width}
-    height={viewBox.height}
-    viewBox={viewBoxStr}
-    font-family="sans-serif"
-    font-size=14
->
-    <!-- connecting lines -->
-    <g
-      fill="none"
-      stroke="#909090"
-      stroke-width="1"
+<div class="relative">
+    <svg
+        class="absolute top-0 left-0"
+        width={viewBox.width}
+        height={viewBox.height}
+        viewBox={viewBoxStr}
+        font-family="sans-serif"
+        font-size=14
     >
-        {#each linkPaths as linkPath}
-            <path
-                d={linkPath}
-            />
-        {/each}
-    </g>
-
-    <!-- nodes -->
-    <g>
-        {#each nodes as node}
-            <g>
-                <rect
-                    x={node.y}
-                    y={node.x - (noteBox.height / 2)}
-                    width={noteBox.width}
-                    height={noteBox.height}
-                    stroke={node.data.editing ? "cyan" : "#404040"}
-                    stroke-width=2
-                    rx=5
-                    fill="transparent"
-                    class="cursor-pointer"
-                    on:click={() => setEditingParent(node.id)}
+        <!-- connecting lines -->
+        <g
+        fill="none"
+        stroke="#909090"
+        stroke-width="1"
+        >
+            {#each linkPaths as linkPath}
+                <path
+                    d={linkPath}
                 />
-                <text
-                    dy="0.5em"
-                    x={node.y + 10}
-                    y={node.x}
-                    width={noteBox.width}
-                    height={noteBox.height}
-                    >
-                    {node.data.text}
-                </text>
-            </g>
+            {/each}
+        </g>
+
+        <!-- nodes -->
+        <g>
+            {#each nodes as node}
+                <g>
+                    <rect
+                        x={node.y}
+                        y={node.x - (noteBox.height / 2)}
+                        width={noteBox.width}
+                        height={noteBox.height}
+                        stroke={node.data.editing ? "cyan" : "#404040"}
+                        stroke-width=2
+                        rx=5
+                        fill="transparent"
+                        class="cursor-pointer"
+                    />
+                </g>
+            {/each}
+        </g>
+    </svg>
+    <div
+        class="absolute top-0 left-0"
+    >
+        {#each nodes as node}
+            <div
+                class="absolute pr-2 py-1"
+                style:left={`${node.y - viewBox.minX}px`}
+                style:top={`${node.x - (noteBox.height / 2) - viewBox.minY}px`}
+                style:width={`${noteBox.width}px`}
+                style:height={`${noteBox.height}px`}
+                >
+                <TreeNote
+                    text={node.data.text}
+                    leaf={!node.children}
+                    editing={node.data.editing}
+                    on:setParent={() => setEditingParent(node.id)}
+                    on:delete={() => deleteNode(node.id)}
+                />
+            </div>
         {/each}
-    </g>
-</svg>
+    </div>
+</div>
 
 
 <style>
